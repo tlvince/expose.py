@@ -28,11 +28,12 @@ This script requires Python 3 and the following dependencies:
 * pyprind
 * docopt
 * jinja2
+* PyYAML
 
 Install them with the following:
 
 ```sh
-pip3 install pyprind docopt jinja2
+pip3 install pyprind docopt jinja2 pyyaml
 ```
 
 Then clone or download this repo into a directory of your choice. Either:
