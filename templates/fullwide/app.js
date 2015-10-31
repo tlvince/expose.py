@@ -16,23 +16,6 @@ function trueWidth() {
   return browserWidth() * pixelRatio()
 }
 
-function scrolledTo(pos) {
-  var progress = document.getElementById('progress-inner')
-  var total = slides.length
-  var width = pos * 100 / total + '%'
-  progress.style.width = width
-}
-
-slides.forEach(function(id, i) {
-  var elem = document.getElementById(id)
-  if (!elem) return
-  
-  var watcher = scrollMonitor.create(elem)
-  watcher.enterViewport(function() {
-    scrolledTo(i + 1)
-  })
-})
-
 document.addEventListener('lazybeforeunveil', function(e) {
   // Lazy load responsive videos right before they're unveiled by lazysizes
   // This doesn't load larger versions when the window resizes
@@ -86,8 +69,6 @@ $.getJSON('metadata.json').done(function(metadata) {
     if (style) elem.style.cssText = style
   })
 })
-
-scrolledTo(1)
 
 $('.slide-desc').flowtype({
   minFont: 12,

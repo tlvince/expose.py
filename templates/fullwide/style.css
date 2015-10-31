@@ -9,20 +9,6 @@ img, video {
   width: 100%;
 }
 
-#progress-outer {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-}
-
-#progress-inner {
-  height: 4px;
-  width: 20%;
-  background-color: #61c3f8;
-  transition-duration: 0.5s;
-}
-
 /* absolute positioning:
    https://css-tricks.com/absolute-positioning-inside-relative-positioning/ */
 .slide {

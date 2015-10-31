@@ -7,9 +7,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="progress-outer">
-    <div id="progress-inner"></div>
-  </div>
   {% for m in media %}
     <div id="slide_{{ loop.index }}" class="slide">
       <span id="slide_{{ loop.index }}_desc" class="slide-desc"></span>
@@ -27,17 +24,11 @@
   {% endfor %}
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/1.3.1/lazysizes.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/scrollmonitor/1.0.12/scrollMonitor.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/markdown.js/0.5.0/markdown.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Flowtype.js/1.1.0/flowtype.min.js"></script>
 
   <script>
-    var slides = [
-      {% for m in media %}
-        'slide_{{ loop.index }}',
-      {% endfor %}
-    ]
     var slidesById = {
       {% for m in media %}
         '{{ m.name }}': 'slide_{{ loop.index }}',
