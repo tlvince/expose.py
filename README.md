@@ -83,7 +83,6 @@ Copyright (c) 2015 Matthew Lewis. Licensed under [the MIT License](http://openso
 ## Code
 
 * Move JS deps into the app instead of running off cdnjs
-* Configurable, non-hard-coded config
 * Alternate source/output dirs
 
 ## Docs

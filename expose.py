@@ -5,7 +5,7 @@ process photos and videos into a static site photojournal
 https://github.com/mplewis/expose.py
 
 Usage:
-    expose.py [--verbose --dry-run --site-only]
+    expose.py [--verbose --dry-run --site-only --config=<path>]
     expose.py [--dry-run] --create-template
     expose.py --help
     expose.py --version
@@ -15,6 +15,7 @@ Options:
     -h, --help             Show this screen
     --version              Show version
     --paths                Show script and working directories
+    --config=<path>        Path to a config file [default: .expose.yml]
     -v, --verbose          Enable verbose log messages
     -d, --dry-run          Log all actions but don't execute them
     -s, --site-only        Skip rendering and just build HTML
@@ -92,19 +93,6 @@ VIDEO_FMT_EXTS = {
 }
 
 METADATA_FILENAME = 'metadata.yml'
-
-# Config is a named tuple that's passed between most of these methods. It
-# makes it easier to work with a runtime config without making the config a
-# global.
-Config = namedtuple('Config', ('SRC_DIR '
-                               'DST_DIR '
-                               'TEMPLATE '
-                               'IMAGE_PATTERNS '
-                               'VIDEO_PATTERNS '
-                               'RESOLUTIONS '
-                               'VIDEO_FORMATS '
-                               'VIDEO_BITRATES '
-                               'VIDEO_VBR_MAX_RATIO'))
 
 # ImageJob and VideoJob are named tuples that hold info on a single image/video
 # output target job. They're easy to pass around multithreading pools.
@@ -625,6 +613,40 @@ def create_template(cfg, dry_run):
             f.write(metadata_template)
     return True
 
+def parse_config(config_file):
+    """
+    Reads a config file and returns a named tuple with pre-defined defaults.
+    """
+    Config = namedtuple('Config', (
+        'SRC_DIR',
+        'DST_DIR',
+        'TEMPLATE',
+        'IMAGE_PATTERNS',
+        'VIDEO_PATTERNS',
+        'RESOLUTIONS',
+        'VIDEO_FORMATS',
+        'VIDEO_BITRATES',
+        'VIDEO_VBR_MAX_RATIO',
+    ))
+
+    Config.__new__.__defaults__ = (
+        getcwd(),
+        join(getcwd(), '_site'),
+        'fullwide',
+        ['*.jpg'],
+        ['*.mp4'],
+        [3840, 2560, 1920, 1280, 1024, 640],
+        [40, 24, 12, 7, 4, 2],
+        ['h264', 'webm'],
+        2,
+    )
+
+    config = {}
+    if isfile(config_file):
+        with open(config_file, 'r') as f:
+            config = yaml.load(f)
+
+    return Config(**config)
 
 if __name__ == '__main__':
 
@@ -645,19 +667,8 @@ if __name__ == '__main__':
         l.info('Template directory:  {}'.format(TEMPLATES_DIR))
         exit(0)
 
-    # The default config.
-    # No way to modify this right now besides editing this file.
-    config = Config(
-        SRC_DIR=getcwd(),
-        DST_DIR=join(getcwd(), '_site'),
-        TEMPLATE='fullwide',
-        IMAGE_PATTERNS=['*.jpg'],
-        VIDEO_PATTERNS=['*.mp4'],
-        RESOLUTIONS=[3840, 2560, 1920, 1280, 1024, 640],
-        VIDEO_BITRATES=[40, 24, 12, 7, 4, 2],
-        VIDEO_FORMATS=['h264', 'webm'],
-        VIDEO_VBR_MAX_RATIO=2,
-    )
+    # Parse the config
+    config = parse_config(args['--config'])
 
     # Dry run: don't write anything
     dry_run = args['--dry-run']
