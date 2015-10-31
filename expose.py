@@ -23,6 +23,7 @@ Options:
 VERSION = 'expose.py 0.0.1'
 
 # External deps
+import yaml
 import pyprind
 from docopt import docopt
 from jinja2 import Environment, FileSystemLoader
@@ -30,7 +31,6 @@ from jinja2 import Environment, FileSystemLoader
 # System deps
 import hashlib
 import json
-import yaml
 import re
 import logging as l
 from multiprocessing import Pool, Manager
