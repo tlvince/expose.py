@@ -75,18 +75,6 @@ document.addEventListener('lazybeforeunveil', function(e) {
 
 })
 
-// Request metadata and add it to the description elements
-$.getJSON('metadata.json').done(function(metadata) {
-  $.each(metadata.slides, function(key, val) {
-    var id = slidesById[key] + '_desc'
-    var elem = document.getElementById(id)
-    var content = val.content
-    var style = val.style
-    if (content) elem.innerHTML = markdown.toHTML(content)
-    if (style) elem.style.cssText = style
-  })
-})
-
 scrolledTo(1)
 
 $('.slide-desc').flowtype({

@@ -29,11 +29,12 @@ This script requires Python 3 and the following dependencies:
 * docopt
 * jinja2
 * PyYAML
+* mistune (optionally with cython for performance boons)
 
 Install them with the following:
 
 ```sh
-pip3 install pyprind docopt jinja2 pyyaml
+pip3 install pyprind docopt jinja2 pyyaml mistune
 ```
 
 Then clone or download this repo into a directory of your choice. Either:

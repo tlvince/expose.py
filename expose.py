@@ -25,6 +25,7 @@ VERSION = 'expose.py 0.0.1'
 # External deps
 import yaml
 import pyprind
+import mistune
 from docopt import docopt
 from jinja2 import Environment, FileSystemLoader
 
@@ -522,15 +523,18 @@ def template_dir(cfg):
     """Get the source directory for the template in use."""
     return join(TEMPLATES_DIR, cfg.TEMPLATE)
 
-
-def render_html_from_media(cfg, media, dry_run):
+def render_html(cfg, media, metadata, dry_run):
     """
     Read output files and render HTML into the output directory.
     """
     l.info('Rendering HTML from {} media items'.format(len(media)))
     env = Environment(loader=FileSystemLoader(template_dir(cfg)))
+    env.filters['markdown'] = mistune.Markdown()
     template = env.get_template('index.html.jinja2')
-    rendered = template.render({'media': media})
+    rendered = template.render({
+        'media': media,
+        'metadata': metadata
+    })
     html_out = join(cfg.DST_DIR, 'index.html')
     if dry_run:
         l.info('Dry run: render HTML to {}'.format(html_out))
@@ -580,28 +584,6 @@ def generate_metadata_template(cfg):
             }
     return ordered_dump(slides, default_flow_style=False)
 
-
-def copy_metadata(cfg, dry_run):
-    """
-    Copy metadata from source YAML to output JSON. Create a blank template
-    if none exists.
-    """
-    metadata = join(cfg.SRC_DIR, METADATA_FILENAME)
-    if isfile(metadata):
-        with open(metadata) as f:
-            metadata = json.dumps(yaml.load(f))
-            json_path = join(cfg.DST_DIR, 'metadata.json')
-            if dry_run:
-                l.info('Dry run: Writing {}'.format(json_path))
-            else:
-                l.info('Writing {}'.format(json_path))
-                with open(json_path, 'w') as j:
-                    j.write(metadata)
-    else:
-        l.info('No {} found'.format(METADATA_FILENAME))
-        create_template(cfg, dry_run)
-
-
 def create_template(cfg, dry_run):
     """
     Create a blank metadata template unless a metadata file already exists.
@@ -625,6 +607,17 @@ def create_template(cfg, dry_run):
             f.write(metadata_template)
     return True
 
+def read_metadata(cfg, dry_run):
+    """
+    Return the parsed the metadata file. Create a blank template
+    if none exists.
+    """
+    metadata = join(cfg.SRC_DIR, METADATA_FILENAME)
+    if not isfile(metadata):
+        l.info('No {} found'.format(METADATA_FILENAME))
+        create_template(cfg, dry_run)
+    with open(metadata) as f:
+        return yaml.load(f)
 
 if __name__ == '__main__':
 
@@ -684,9 +677,9 @@ if __name__ == '__main__':
     # These steps should be self-explanatory:
     # Read the output dir and make a list of media found
     media = web_media_from_output(config.DST_DIR)
-    # Render HTML from the media we just found
-    render_html_from_media(config, media, dry_run)
+    # Read the metadata file
+    metadata = read_metadata(config, dry_run)
+    # Render HTML from the media and metadata we just found
+    render_html(config, media, metadata, dry_run)
     # Add the template files
     copy_template_static_files(config, dry_run)
-    # Copy the metadata.yml into a metadata.json
-    copy_metadata(config, dry_run)
